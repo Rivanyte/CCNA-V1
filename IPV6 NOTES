@@ -1,0 +1,176 @@
+Ipv4 Octet
+IPv6 Hextet
+
+How to shorten IPv6 Address
+1. All leading zeroes must be dropped
+    :000a:  >   :a:
+2. Consecutive Zeroes become a :: CAN ONLY HAPPEN ONCE
+    :0000:0000:0000:0000:   >  ::
+
+3. The first set of consecutive zeroes become a ::
+while, the other zeroes will become :0:0:
+
+4. The most consecutive zeroes become a ::
+
+
+
+===============
+
+1. 000a:000c:0000:0000:0000:0000:0000:0000/64 =
+	a:c::/64
+2. 0000:0000:0000:0000:0000:0000:0000:0000/0 = 
+        ::/0  =  Default Gateway IPv6	
+3. fe80:0000:0000:0000:000a:0000:0000:000f/64 =
+	fe80::a:0:0:f/64
+4. 2002:6500:0000:3000:0000:0000:0000:0000/64 = 
+	2002:6500:0:3000::/64
+5. 0000:0000:0000:0000:0000:0000:0000:0001/128 = 
+	::1/128  = Loopback Address
+6. ff00:0000:0000:beef:a00a:0aa0:0000:0000/8 = 
+        ff00::beef:a00a:aa0:0:0/8
+
+Bin     Dec     Hex
+0000    0       0
+0001    1       1
+0010    2       2
+0011    3       3
+0100    4       4
+0101    5       5
+0110    6       6
+0111    7       7
+1000    8       8
+1001    9       9
+1010    10      A
+1011    11      B
+1100    12      C
+1101    13      D
+1110    14      E
+1111    15      F
+10000   16      10c
+
+
+How to find the slash
+(Hextet 5th, Hexadecimal 2nd, 4i)
+
+
+/100
+(7th Hextet, Hexadecimal 1st, 1i)
+
+==============
+Create a network for 8 sites using the ipv6 address:
+2001:fd80::/64
+C: 8 = 3 bits
+A: /64 + 3 = /67  ( 5th Hextet, 1st Hexadecimal , 2i)
+I
+2001:fd80:0000:0000:0000:0000:0000:0000/67  = 1st Site
+2001:fd80:0000:0000:2000:0000:0000:0000/67  = 2nd Site
+2001:fd80:0000:0000:4000:0000:0000:0000/67  = 3rd
+2001:fd80:0000:0000:6000:0000:0000:0000/67  = 4th
+2001:fd80:0000:0000:8000:0000:0000:0000/67  = 5th
+2001:fd80:0000:0000:A000:0000:0000:0000/67  = 6th
+2001:fd80:0000:0000:C000:0000:0000:0000/67  = 7th
+2001:fd80:0000:0000:E000:0000:0000:0000/67  = 8th
+
+Using the 4th Network, apply the first valid IP to R1 e0/0
+last valid to R2 e0/0 int
+
+
+Network: 2001:fd80:0000:0000:6000:0000:0000:0000/67  +1
+First Valid: 2001:fd80:0:0:6000::1/67
+Last Valid:  
+Anycast: (last 128 ips)
+
+Not Network: 
+2001:fd80:0000:0000:8000:0000:0000:0000/67  = 5th
+
+
+!@Edge
+conf t
+ ipv6 unicast-routing
+ int lo100
+  ipv6 add 2001:fd80:0:0:6000::1/67
+ int lo101
+  ipv6 add 2001:fd80:0:0:8000::1/67
+ int lo102
+  ipv6 add 2001:fd80:0:0:A000::1/67
+ int lo103
+  ipv6 add 2001:fd80:0:0:C000::1/67
+  end
+
+==============
+Create a network for 16 sites using the ipv6 address:   2001:fd80::/64
+C: 16 = 4bits 
+A: /64 + 4 = /68    (Hextet 5th, Hex 1st, 1i)
+I:
+2001:fd80:0000:0000:0000:0000:0000:0000/64
+
+Give the first 4 networks
+1st: 2001:fd80::/68 + 1
+   1st Valid: 2001:fd80::1/68
+   Last Valid: 2001:fd80::fff:ffff:ffff:ffff/68
+
+2nd: 2001:fd80:0:0:1000::/68
+   1st valid: 2001:fd80:0:0:1000::1/68
+   Last valid 2001:fd80::1fff:ffff:ffff:ffff/68
+
+3rd: 2001:fd80:0:0:2000::/68
+4th: 2001:fd80:0:0:3000::/68
+
+!@I4
+conf t
+ ipv6 unicast-routing
+ int e0/0
+   ipv6 add 2001:fd80::1/68
+   no shut
+   end
+
+!@R4
+conf t
+ ipv6 unicast-routing
+ int e0/0
+   ipv6 add 2001:fd80::fff:ffff:ffff:ffff/68
+   no shut
+   end
+
+!@I3
+conf t
+ ipv6 unicast-routing
+ int e0/0
+   ipv6 add 2001:fd80:0:0:1000::1/68
+   no shut
+   end
+
+!@R3
+conf t
+ ipv6 unicast-routing
+ int e0/0
+   ipv6 add 2001:fd80::1fff:ffff:ffff:ffff/68
+   no shut
+   end
+
+
+NETWORK: 2001:db8:12::/126
+      2001:0db8:0012:0000:0000:0000:0000:0000/126  
+First: 2001:0db8:0012:0000:0000:0000:0000:0001/126 
+Last: 2001:0db8:0012:0000:0000:0000:0000:0003/126 
+NOT NETWORK
+      2001:0db8:0012:0000:0000:0000:0000:0004/126
+
+
+
+wr
+copy run start
+write mem
+
+
+
+
+
+
+
+
+
+
+
+
+
