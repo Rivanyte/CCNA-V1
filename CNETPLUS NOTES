@@ -1,0 +1,424 @@
+Layer 1 PoE 802.3at & 802.3af
+Layer 2 Mac Address
+Layer 3 IP
+Layer 4 Transport Layer : Ports
+  !@cmd
+  nmap -v 10.12.100.8
+    TFTP
+    SCCP
+    SIP
+
+Layer 5 Session Layer
+    RTP
+
+SPAN - Switchport Analyzer
+!@CoreBABA
+conf t
+ no monitor session 1 source int fa0/3,fa0/5,fa0/7,fa0/9
+ no monitor session 1 destination int fa0/1
+ end
+
+
+Layer 6:b  Presentation
+.exe .jpg g711ulaw g729
+
+
+=================================
+Network
+
+   Normal (0-9)    |   IPv4 (0-255)  |  IPv6 (0-9,A-F)
+-1 1999                1.255.255.255    :1FFF:
+   2000                2.0.0.0          :2000:
++1 2001                2.0.0.1          :2001:
+
+-1 4999                4.255.255.255    :4FFF:
+   5000                5.0.0.0          :5000:
++1 5001                4.0.0.1          :5001:
+
+-1 7008                7.0.0.254        :700E:
+   7009                7.0.0.255        :700F:
++1 7010                7.0.1.0          :7010:
+
+========
+                       0000
+                       0001
+                       0010
+
+Find Bit Length
+Value	Bits
+195	8 bits
+13	4 bits
+1,750	11 bits
+1,855	11 bits
+2,700	12 bits
+2	2 bits
+376	9 bits
+888	10 bits
+8	4 bits
+212	8 bits
+4,500	13 bits
+81	7 bits
+20,000	15 bits
+55	6 bits
+your age 5 bits
+
+
+
+Private IP address
+Class A 10.0.0.0/8 - 10.255.255.255  65 m
+Class B 172.16.0.0/16 - 172.31.255.255   VPNs
+Class C 192.168.0.0/24 - 192.168.255.255
+
+
+===
+Design a network for Accenture.com with 1750 agents, tm, admins. Use the 10.0.0.0/8 IP address space.
+a 10.16.0.0/24
+b 10.0.4.0/22
+c 10.0.8.0/21
+d 10.0.32.0/20
+
+CSI
+Convert:
+   1750 = 11 bits
+Subtract
+   /32 - 11 = /21 = Network bits  (3rd, 8i)
+Ipasok si i sa octet   ni 10.0.0.0
+
+10.0.8.0 /21
+
+
+
+====
+Design a network for concentrix.com with 160 admin, 250 managers, 112 executive, 100 security agents. Use the 172.16.0.0/16 IP address space.
+ 172.16.8.0 /22
+ 172.16.16.0 /23
+ 172.16.4.0 /22
+ 172.16.2.0 /23
+
+622 hosts
+
+CSI
+Convert
+  622 = 10 bits
+Subtract
+  /32 - 10 = /22  (3rd, 4i)
+Ipasok si i sa octet   ni 172.16.0.0/16
+172.16.4.0 /22
+
+===
+Design and implement a network for foundever.com with 45 users. Use the 192.168.0.0/24 IP address space
+CIA Method
+
+CONVERT: 45 = 6 bits
+SUBTRACT: /32 - 6 = /26 (4th, 64i)
+INSERT(Ipasok):
+Ipasok si i sa octet   ni 192.168.0.0/24
+192.168.0.64/26
+
+Network (foundever.com): 192.168.0.64/26
+First Valid IP (+1 Network): 192.168.0.65
+Last Valid IP (-1 Broadcast): 192.168.0.126
+Last IP/Broadcast (-1 Not Network): 192.168.0.127
+
+Not Network: 192.168.0.128/26
+
+⦁	VLAN 26
+⦁	Reserve First 10 IPs
+
+
+config t
+ vlan 26
+  name _____.com
+  exit
+ int vlan 26
+  ip add __.__.__.__  __.__.__.__
+  ip ospf 1 area 0
+  no shut
+  exit
+ ip dhcp excluded-add __.__.__.__  __.__.__.__
+ ip dhcp pool _____.com
+  network __.__.__.__  __.__.__.__
+  default-router __.__.__.__
+  domain-name _____.com
+  dns-server 10.#$34T#.1.10
+  option 150 ip 10.#$34T#.100.8
+ int fa 0/7
+  switchport voice vlan 26
+  shut
+  no shut
+  end
+show ip dhcp binding
+
+
+===
+Design and implement a network for etelecare.com with 178 users. Use the 192.168.0.0/24 IP address space
+CIA Method
+C: 178 = 8 bits
+S: /32 - 8 = /24 (3rd, 1i)
+I: 192.168.1.0/24
+
+Network (etelecare.com): 192.168.1.0/24
+First Valid IP (+1 Network): 192.168.1.1
+Last Valid IP (-1 Broadcast): 192.168.1.254
+Last IP/Broadcast (-1 Not Network): 192.168.1.255
+
+Not Network: 192.168.2.0/24
+
+
+
+561 - 582
+
+!@CoreBABA
+config t
+ vlan 25
+  name etelecare.com
+  exit
+ int vlan 25
+  ip add 192.168.1.1 255.255.255.0
+  ip ospf 1 area 0
+  no shut
+  exit
+ ip dhcp excluded-add 192.168.1.1  192.168.1.100
+ ip dhcp pool etelecare.com
+  network 192.168.1.0  255.255.255.0
+  default-router 192.168.1.1
+  domain-name etelecare.com
+  dns-server 10.12.1.10
+  option 150 ip 10.12.100.8
+ int fa 0/5
+  switchport voice vlan 25
+  shut
+  no shut
+  end
+show ip dhcp binding
+
+
+!@CoreBABA
+conf t
+ int fa0/5
+  shut
+  no shut
+  end
+
+
+
+
+=====
+Admins
+Computers
+CSI if hosts
+CAI if network
+
+Subnet for 8 offices using 192.168.0.0/24
+Convert:
+8 = 3 bits
+
+Add:
+/24 + 3 bits = /27 (4th, 32i)
+
+Ipasok 8 times:
+192.168.0.0
+192.168.0.32
+192.168.0.64
+192.168.0.96
+192.168.0.128
+192.168.0.160
+192.168.0.192
+192.168.0.224
+
+
+
+Network 192.168.0.0/24 (3rd 1i)
+Not: 192.168.1.0 / 24
+
+
+Apply the first valid ip of 1st - 4th subnets to loopbacks
+!@EDGE
+conf t
+ int lo10
+  ip add 192.168.0.1 255.255.255.224
+  exit
+ int lo11
+  ip add 192.168.0.33 255.255.255.224
+  exit
+ int lo12
+  ip add 192.168.0.65 255.255.255.224
+  exit
+ int lo13
+  ip add 192.168.0.97 255.255.255.224
+  end
+
+
+=====
+Subnet for 64 sites, using the network 10.0.0.0 /20
+C: 64 = 6 bits
+A: /20 + 6 = /26 (4th, 64i)
+I:
+
+Find the first 4 networks
+10.0.0.0 /26 = First
+10.0.0.64 /26
+10.0.0.128 /26
+10.0.0.192 /26
+10.0.1.0 /26
+
+
+Find the Network
+10.127.42.100 /19
+
+1st step - rivan format
+/19 = (3rd, 32i)
+
+2nd step - Count i
+
+
+ex2:
+172.16.234.112 /28
+172.16.234.123 /28 (4th 16i)
+0
+16
+32
+...
+112
+128
+
+Find the network:
+ex3:
+10.10.42.1 /21  (3rd, 8i)
+ 10.10.0.0
+ 10.10.40.0 /21
+ 
+172.16.100.56 /27 (4th, 32i)
+ 172.16.100.32 /27
+
+192.168.2.10 /26 (4th, 64i)
+ 192.168.2.0 /26
+
+
+========
+gitHub.com/4rthurcyber08/rivan_day2
+
+whatismyipaddress.com
+
+How to shorten IPv6 Addresses
+1. Leading zeroes must be dropped.
+   :000a:  > :a:
+2. Consecutive zeroes become a double colon
+   :0000:0000: > ::
+
+
+1. 000a:000c:0000:0000:0000:0000:0000:0000/64 =
+	a:c::/64
+2. 0000:0000:0000:0000:0000:0000:0000:0000/0 = 
+        ::/0	= Default Gateway IPv6
+3. fe80:0000:0000:0000:000a:0000:0000:000f/64 =
+	fe80::a:0:0:f/64 = Link Local
+4. 2002:6500:0000:3000:0000:0000:0000:0000/64 = 
+	2001:6500:0:3000::/64 = Reserved Public IPv6 add
+5. 0000:0000:0000:0000:0000:0000:0000:0001/128 = 
+	::1/128 = Loopback
+6. ff00:0000:0000:beef:a00a:0aa0:0000:0000/8 = 
+         ff00::beef:a00a:aa0:0:0/8
+
+ Bin   Hex(Base 16)   Deci (Base 10)
+0000    0             0
+0001    1             1
+0010    2             2
+0011    3             3
+0100    4             4
+0101    5             5
+0110    6             6
+0111    7             7
+1000    8             8
+1001    9             9
+1010    A             10
+1011    B             11
+1100    C             12
+1101    D     13
+1110    E     14
+1111    F     15
+       10     16
+
+
+
+
+
+
+
+
+
+/7 = F   E
+      8i 4i 2i  1i
+      0 0 0|     0
+
+/7 = 1st Hextet, 2nd Hexadecimal, 2i
+
+
+/50 = 4th Hextet, 1st Hexadecimal, 4i
+
+/69 = (5th Hextet, 2nd Hexdecimal, 8i)
+
+=====
+Subnet 16 departments using 2001:fd8::/64
+C:
+ 16 = 4 bits
+A:
+ /64 + 4 = /68 (5th Hextet, 1st Hexadecimal, 1i)
+I:
+2001:fd8::/64
+Long version = 2001:0fd8:0000:0000:0000:0000:0000:0000/68 = First
+   2001:fd8::/68
+2001:0fd8:0000:0000:1000:0000:0000:0000/68
+   2001:fd8:0:0:1000::/68
+2001:0fd8:0000:0000:2000:0000:0000:0000/68
+   2001:fd8:0:0:2000::/68
+2001:0fd8:0000:0000:3000:0000:0000:0000/68
+   2001:fd8:0:0:3000::/68
+2001:0fd8:0000:0000:4000:0000:0000:0000/68
+   2001:fd8:0:0:4000::/68
+
+!@Edge
+conf t
+ipv6 unicast-routing
+int lo200
+ipv6 add 2001:fd8::1/68
+int lo201
+ipv6 add 2001:fd8:0:0:1000::1/68
+int lo202
+ipv6 add 2001:fd8:0:0:2000::1/68
+end
+
+conf t
+int lo205
+ipv6 add 2001:fd8:0:0:6FFF:FFFF:FFFF:FFFF/68
+
+
+Broadcast = Anycast (Network/last 128 ip add)
+
+
+
+
+
+
+
+
+
+
+
+=====
+Subnet 200 departments using 2001:fd8::/101
+C: 200 = 8bits 
+A: /101 + 8 bits = /109 (7th Hextet, 4th Hex, 8i)
+I:
+2001:0fd8:0000:0000:0000:0000:0000:0000/109 = First
+2001:0fd8:0000:0000:0000:0000:0008:0000/109 = 2nd
+2001:0fd8:0000:0000:0000:0000:0010:0000/109 = 3rd
+2001:0fd8:0000:0000:0000:0000:0018:0000/109 = First
+2001:0fd8:0000:0000:0000:0000:0020:0000/109 = First
+2001:0fd8:0000:0000:0000:0000:0028:0000/109 = First
+
+
+
+First 3 Departments
+
+
